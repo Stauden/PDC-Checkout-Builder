@@ -1,6 +1,6 @@
 # Skid Checkout Sheet Builder
 
-Streamlit app for building printed commissioning/checkout sheets for industrial skids.
+Streamlit app for building printed commissioning/checkout sheets for PDCs.
 Replaces a legacy VBA Excel macro tool.
 
 ## Linux Installation
