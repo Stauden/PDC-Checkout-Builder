@@ -29,6 +29,5 @@ class SwitchGearItem:
 
 @dataclass
 class JobConfig:
-    job: JobInfo = field(default_factory=JobInfo)
-    switchgear: list = field(default_factory=list)
-    
+    job: JobInfo = field(default_factory=JobInfo) # JobInfo object
+    switchgear: list[SwitchGearItem] = field(default_factory=list) # list of SwitchGearItem objects

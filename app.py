@@ -9,10 +9,12 @@ from models import (
     SG_TYPE_OPTIONS, SG_ITEM_SUBTYPE_OPTIONS, SG_ITEM_SUBTYPE_IDX
 )
 
+# Sets the page title, icon, and layout for the Streamlit app
 st.set_page_config(page_title="PLC Checkout Sheet Builder", page_icon=":gear:", layout="centered")
 
 # ── session state init ────────────────────────────────────────────────────────
 def _init_state():
+    # Dictionary of default values for session state
     defaults = {
         "started": False,
         "switchgear": [],
@@ -22,19 +24,21 @@ def _init_state():
         "unit_number": "",
         "plc_serial": "",
     }
+    # adds default values to session state if they don't exist
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
             
 _init_state()
 
+# Assigns the values from a JobConfig object to the Streamlit session state
 def _apply_config(cfg: JobConfig):
-    st.session_state["switchgear"]     = cfg.switchgear
     st.session_state["drawing_number"] = cfg.job.drawing_number
     st.session_state["job_number"]     = cfg.job.job_number
     st.session_state["customer_name"]  = cfg.job.customer_name
     st.session_state["unit_number"]    = cfg.job.unit_number
     st.session_state["plc_serial"]     = cfg.job.plc_serial
+    st.session_state["switchgear"]     = cfg.switchgear
     st.session_state.started = True
     
 # ── landing page ──────────────────────────────────────────────────────────────
