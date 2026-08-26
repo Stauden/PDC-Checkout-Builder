@@ -1,4 +1,4 @@
-# Skid Checkout Sheet Builder
+#PDC Checkout Sheet Builder
 
 Streamlit app for building printed commissioning/checkout sheets for PDCs.
 Replaces a legacy VBA Excel macro tool.
