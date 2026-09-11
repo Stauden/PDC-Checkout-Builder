@@ -1,0 +1,102 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  @page { size: letter landscape; margin: 0.5in; }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+  table { border-collapse: collapse; width: 100%; }
+  td { border: 1px solid #000; padding: 2px 6px; }
+  .outer { border: 2px solid #000; margin-bottom: 14px; }
+  .shade { background: #d9d9d9; }
+  .title { text-align: center; font-weight: bold; }
+  .label { text-align: right; }
+  .value { text-align: center; font-weight: bold; }
+  .desc  { text-align: center; }
+  .fieldname { font-style: italic; font-size: 10pt; }
+  .idx { text-align: right; font-style: italic; vertical-align: bottom; }
+  .initials { width: 9%; }
+  .notes { text-align: center; }
+  .noteline { height: 22px; }
+  .blockend td, td.blockend { border-bottom: 2px solid #000; }
+  tbody { page-break-inside: avoid; }
+</style></head>
+<body>
+
+{% for circuit in circuits %}
+<table class="outer">
+
+  <thead>
+    <tr>
+      <td class="label">Initials</td>
+      <td class="title" colspan="3">Switch Gear Circuit #{{ circuit.circuit_number }}</td>
+    </tr>
+    <tr>
+      <td class="shade blockend" rowspan="3"></td>
+      <td class="label">Circuit Name:</td>
+      <td class="desc" colspan="2">{{ circuit.circuit_name }}</td>
+    </tr>
+    <tr>
+      <td class="label">Drawing Number:</td>
+      <td class="desc" colspan="2">{{ circuit.drawing_number }}</td>
+    </tr>
+    <tr>
+      <td class="label">Type:</td>
+      <td class="desc" colspan="2">{{ circuit.type }}</td>
+    </tr>
+  </thead>
+
+  {% for element in circuit.circuit_strings %}
+  <tbody>
+    {% if loop.last %}
+      <tr>
+        <td class="initials"></td>
+        <td class="desc">{{ element.device_description }}</td>
+        <td class="value">{{ element.output_wire }}</td>
+        <td class="fieldname">Wire #</td>
+      </tr>
+      <tr class="blockend">
+        <td class="shade idx">{{ loop.index }}</td>
+        <td class="desc">{{ element.comment }}</td>
+        <td class="value">{{ element.output_terminal }}</td>
+        <td class="fieldname">Ending Terminal</td>
+      </tr>
+    {% else %}
+      <tr>
+        <td class="initials"></td>
+        <td class="desc">{{ element.device_description }}</td>
+        <td class="value">{{ element.input_terminal }}</td>
+        <td class="fieldname">Input Terminal</td>
+      </tr>
+      <tr>
+        <td class="shade idx blockend" rowspan="3">{{ loop.index }}</td>
+        <td class="desc">{{ element.comment }}</td>
+        <td class="value">{{ element.output_terminal }}</td>
+        <td class="fieldname">Output Terminal</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="value">{{ element.output_wire }}</td>
+        <td class="fieldname">Output Wire #</td>
+      </tr>
+      <tr class="blockend">
+        <td></td>
+        <td class="value">{{ element.logic_gate }}</td>
+        <td class="fieldname">Logic</td>
+      </tr>
+    {% endif %}
+  </tbody>
+  {% endfor %}
+
+  <tbody>
+    <tr>
+      <td class="shade"></td>
+      <td class="notes">Notes</td>
+      <td class="shade" colspan="2"></td>
+    </tr>
+    <tr><td class="noteline" colspan="4"></td></tr>
+    <tr><td class="noteline" colspan="4"></td></tr>
+  </tbody>
+
+</table>
+{% endfor %}
+
+</body></html>
