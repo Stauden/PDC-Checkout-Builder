@@ -1,6 +1,6 @@
 '''
 ~ per string structure ~
-  string_# = { headers : value ..., circuit_strings: [{row_1}, {row_2}, ...]}
+  string_# = { header : value, ..., circuit_strings: [{row_1}, {row_2}, ...]}
 '''
 PDC_Circuit_Strings = [
   #Circuit #1 - Dictionary

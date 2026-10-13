@@ -24,7 +24,7 @@
 {% for circuit in circuits %}
 <table class="outer">
 
-  <thead>
+  <tbody>
     <tr>
       <td class="label">Initials</td>
       <td class="title" colspan="3">Switch Gear Circuit #{{ circuit.circuit_number }}</td>
@@ -42,7 +42,7 @@
       <td class="label">Type:</td>
       <td class="desc" colspan="2">{{ circuit.type }}</td>
     </tr>
-  </thead>
+  </tbody>
 
   {% for element in circuit.circuit_strings %}
   <tbody>
