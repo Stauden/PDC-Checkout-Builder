@@ -13,17 +13,23 @@ env = Environment(
     undefined=StrictUndefined,
 )
 
-def build(circuits, out_name="string_sheet"):
+#Builds the HTML and PDF files from the circuit data
+def build_sheet(circuits, out_name="string_sheet"):
     html = env.get_template("string_sheet.html").render(circuits=circuits)
     (BASE_DIR.joinpath(f"{out_name}.html")).write_text(html, encoding="utf-8")
     from weasyprint import HTML
     HTML(string=html).write_pdf(BASE_DIR.joinpath(f"{out_name}.pdf"))
     return html
+
+
+#Testing build function with the PDC_Circuit_Strings data from data.py
 '''
+#__name__ and __main__ are used to check if the script is being run directly or imported as a module.
+
 if __name__ == "__main__":
     build(PDC_Circuit_Strings)
     print("wrote sheet.html and sheet.pdf")
-'''
+
 long_circuit = {
     "circuit_number": 99,
     "circuit_name": "Page break test",
@@ -32,4 +38,4 @@ long_circuit = {
     "circuit_strings": [PDC_Circuit_Strings[0]["circuit_strings"][0]] * 1000
 }
 build([long_circuit], "pagetest")   
-
+'''
