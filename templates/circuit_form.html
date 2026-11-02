@@ -1,0 +1,17 @@
+<form method="post" action="/circuit_form/circuit_submit">
+  <input name="device_description" placeholder="Device Description"> <br>
+  <input name="input_terminal" placeholder="Input Terminal"> <br>
+  <input name="comment" placeholder="Comment"> <br>
+  <input name="output_terminal" placeholder="Output Terminal"> <br>
+  <input name="output_wire" placeholder="Output Wire"> <br>
+  <select name="logic_gate" placeholder="Logic Gate">
+    <option value="OR">OR</option>
+    <option value="AND">AND</option>
+    <option value="END">END</option>
+  </select> <br>
+  <button type="submit">Submit</button><br>
+  <table>
+    {rows}
+  </table>
+</form>
+<a href="/circuit_form/view_circuit">View Circuit</a>

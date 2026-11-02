@@ -1,7 +1,7 @@
 <!doctype html>
 <html><head><meta charset="utf-8">
 <style>
-  @page { size: letter landscape; margin: 0.5in; }
+  @page { size: letter; margin: 0.5in; }
   body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
   table { border-collapse: collapse; width: 100%; }
   td { border: 1px solid #000; padding: 2px 6px; }
@@ -21,6 +21,7 @@
 </style></head>
 <body>
 
+{% set counter = namespace(n=0) %}
 {% for circuit in circuits %}
 <table class="outer">
 
@@ -46,6 +47,7 @@
 
   {% for element in circuit.circuit_strings %}
   <tbody>
+    {% set counter.n = counter.n + 1 %}
     {% if loop.last %}
       <tr>
         <td class="initials"></td>
@@ -54,7 +56,7 @@
         <td class="fieldname">Wire #</td>
       </tr>
       <tr class="blockend">
-        <td class="shade idx">{{ loop.index }}</td>
+        <td class="shade idx">{{ counter.n }}</td>
         <td class="desc">{{ element.comment }}</td>
         <td class="value">{{ element.output_terminal }}</td>
         <td class="fieldname">Ending Terminal</td>
@@ -67,7 +69,7 @@
         <td class="fieldname">Input Terminal</td>
       </tr>
       <tr>
-        <td class="shade idx blockend" rowspan="3">{{ loop.index }}</td>
+        <td class="shade idx blockend" rowspan="3">{{ counter.n }}</td>
         <td class="desc">{{ element.comment }}</td>
         <td class="value">{{ element.output_terminal }}</td>
         <td class="fieldname">Output Terminal</td>

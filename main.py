@@ -4,13 +4,20 @@ from build import BASE_DIR, build_sheet
 
 '''
 Start: uvicorn main:app --reload
+Start: uv run fastapi dev main.py
 '''
 
 #ELEMENTS Holds a list of dictionaries, each dictionary represents a circuit element with its properties.
 ELEMENTS = []
 app = FastAPI()
 
-#
+#Home Page
+@app.get("/")
+def home():
+    #FastAPI converts the dictionary to a JSON response automatically
+    return {"message": "Welcome to the PDC Checkout Builder API"}
+
+#Circuit Form Page
 @app.get("/circuit_form", response_class=HTMLResponse)
 def circuit_form():
     rows = ""
@@ -36,7 +43,7 @@ def circuit_form():
     <a href="/circuit_form/view_circuit">View Circuit</a>
     """
 
-#
+#View Circuit Page
 @app.get("/circuit_form/view_circuit", response_class=HTMLResponse)
 def view_circuit():
     view = build_sheet([get_circuit()], "test_user_defined_circuit")
@@ -46,13 +53,13 @@ def view_circuit():
     """
     return links + view
 
-#
+#Download Circuit Page
 @app.get("/circuit_form/download_circuit")
 def download_circuit():
     build_sheet([get_circuit()], "test_user_defined_circuit")
     return FileResponse(BASE_DIR.joinpath("test_user_defined_circuit.pdf"), media_type="application/pdf", filename="test_user_defined_circuit.pdf")
 
-#
+#Circuit Submit Page
 @app.post("/circuit_form/circuit_submit")
 def circuit_submit(device_description: str = Form(...), input_terminal: str = Form(...), comment: str = Form(...), output_terminal: str = Form(...), output_wire: str = Form(...), logic_gate: str = Form(...)):
     new_element = {

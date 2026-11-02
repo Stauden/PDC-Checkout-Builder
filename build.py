@@ -23,12 +23,13 @@ def build_sheet(circuits, out_name="string_sheet"):
 
 
 #Testing build function with the PDC_Circuit_Strings data from data.py
-'''
+
 #__name__ and __main__ are used to check if the script is being run directly or imported as a module.
 
+'''
 if __name__ == "__main__":
-    build(PDC_Circuit_Strings)
-    print("wrote sheet.html and sheet.pdf")
+    build_sheet(PDC_Circuit_Strings, "Z_def_pagetest")
+    print("wrote Z_def_pagetest.html and Z_def_pagetest.pdf")
 
 long_circuit = {
     "circuit_number": 99,
@@ -37,5 +38,8 @@ long_circuit = {
     "type": "Test",
     "circuit_strings": [PDC_Circuit_Strings[0]["circuit_strings"][0]] * 1000
 }
-build([long_circuit], "pagetest")   
+
+build_sheet([long_circuit], "Z_1000_pagetest")
+print("wrote Z_1000_pagetest.html and Z_1000_pagetest.pdf")
 '''
+
