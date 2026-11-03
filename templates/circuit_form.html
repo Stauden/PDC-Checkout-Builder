@@ -1,4 +1,15 @@
-<form method="post" action="/circuit_form/circuit_submit">
+<form method="post" action="/circuit_form/circuit_headers_submit">
+  <h2>Circuit Form</h2>
+  <hr>
+  <h3>Circuit Headers</h3>
+  <input name="circuit_name" placeholder="Circuit Name"> <br>
+  <input name="drawing_number" placeholder="Drawing Number"> <br>
+  <input name="type" placeholder="Type"> <br>
+  <button type="submit">Submit</button><br>
+  <hr>
+  <h3>Circuit Elements</h3>
+</form>
+<form method="post" action="/circuit_form/circuit_element_submit">
   <input name="device_description" placeholder="Device Description"> <br>
   <input name="input_terminal" placeholder="Input Terminal"> <br>
   <input name="comment" placeholder="Comment"> <br>
@@ -10,8 +21,18 @@
     <option value="END">END</option>
   </select> <br>
   <button type="submit">Submit</button><br>
+  <hr>
   <table>
-    {rows}
-  </table>
+  {% for e in html_circuit.circuit_strings %}
+  <tr>      
+    <td> {{ e.device_description }} </td>
+    <td> {{ e.input_terminal }} </td>
+    <td> {{ e.comment }} </td>
+    <td> {{ e.output_terminal }} </td>
+    <td> {{ e.output_wire }} </td>
+    <td> {{ e.logic_gate }} </td>
+  </tr>
+  {% endfor %}
+</table>
 </form>
 <a href="/circuit_form/view_circuit">View Circuit</a>
