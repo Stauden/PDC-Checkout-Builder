@@ -8,6 +8,9 @@ Start: uvicorn main:app --reload
 Start: uv run fastapi dev main.py
 '''
 
+app = FastAPI()
+templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
 circuit = {
     #headers
     "circuit_number": 1,
@@ -17,19 +20,26 @@ circuit = {
     #elements
     "circuit_strings": []
 }
-app = FastAPI()
-templates = Jinja2Templates(directory=BASE_DIR / "templates")
+
+empty_element = {
+    "device_description": "", "input_terminal": "", "comment": "",
+    "output_terminal": "", "output_wire": "", "logic_gate": "", 
+}
 
 #Home Page
 @app.get("/", response_class=HTMLResponse)
-def home():
-    #FastAPI converts the dictionary to a JSON response automatically
-    return HTMLResponse(f"<h1>Welcome to the PDC Checkout Builder API</h1><a href='/circuit_form'>Go to Circuit Form</a>")
+def home(request: Request):
+    return templates.TemplateResponse(request, "home.html", {"title": "Home"})
 
 #Circuit Form Page
 @app.get("/circuit_form", response_class=HTMLResponse)
 def circuit_form(request: Request):
-    return templates.TemplateResponse(request, "circuit_form.html", {"html_circuit": circuit})
+    return templates.TemplateResponse(request, "circuit_form.html", {
+        "circuit_i": circuit,
+        "title": "Circuit Form",
+        "edit_element": empty_element,
+        "edit_index": ""
+        })
 
 #View Circuit Page
 @app.get("/circuit_form/view_circuit", response_class=HTMLResponse)
@@ -52,6 +62,26 @@ def download_circuit():
         headers={"Content-Disposition": 'attachment; filename="web_output_circuit.pdf"'}
     )
 
+#Deleteing rows
+@app.get("/circuit_form/delete/{index}")
+def delete_circuit_row(index: int):
+    if 0 <= index < len(circuit["circuit_strings"]):
+        del circuit["circuit_strings"][index]
+    return RedirectResponse("/circuit_form", status_code=303)
+
+#Editing rows
+@app.get("/circuit_form/edit/{index}", response_class=HTMLResponse)
+def edit_circuit_row(request: Request, index: int):
+    if not(0 <= index < len(circuit["circuit_strings"])):
+        return RedirectResponse("/circuit_form", status_code=303)
+    element = circuit["circuit_strings"][index]
+    return templates.TemplateResponse(request, "circuit_form.html", {
+        "circuit_i": circuit, 
+        "edit_index": index, 
+        "edit_element": element, 
+        "title": "Circuit Form"
+        })
+
 #Circuit Headers Submit
 @app.post("/circuit_form/circuit_headers_submit")
 def circuit_headers_submit( circuit_name: str = Form(...), drawing_number: str = Form(...), type: str = Form(...)):
@@ -62,7 +92,7 @@ def circuit_headers_submit( circuit_name: str = Form(...), drawing_number: str =
 
 #Circuit Elements Submit
 @app.post("/circuit_form/circuit_element_submit")
-def circuit_element_submit(device_description: str = Form(...), input_terminal: str = Form(...), comment: str = Form(...), output_terminal: str = Form(...), output_wire: str = Form(...), logic_gate: str = Form(...)):
+def circuit_element_submit(device_description: str = Form(...), input_terminal: str = Form(...), comment: str = Form(...), output_terminal: str = Form(...), output_wire: str = Form(...), logic_gate: str = Form(...), index: str = Form(...)):
     new_element = {
         "device_description": device_description,
         "input_terminal": input_terminal,
@@ -71,5 +101,8 @@ def circuit_element_submit(device_description: str = Form(...), input_terminal: 
         "output_wire": output_wire,
         "logic_gate": logic_gate
     }
-    circuit["circuit_strings"].append(new_element)
+    if index == "":
+        circuit["circuit_strings"].append(new_element)
+    else:
+        circuit["circuit_strings"][index] = new_element
     return RedirectResponse("/circuit_form", status_code=303) #303 means make a get request to that URL. 

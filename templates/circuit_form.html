@@ -1,30 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
 <form method="post" action="/circuit_form/circuit_headers_submit">
   <h2>Circuit Form</h2>
   <hr>
   <h3>Circuit Headers</h3>
-  <input name="circuit_name" placeholder="Circuit Name"> <br>
-  <input name="drawing_number" placeholder="Drawing Number"> <br>
-  <input name="type" placeholder="Type"> <br>
+  <input name="circuit_name" value="{{ circuit_i.circuit_name }}" placeholder="Circuit Name"> <br>
+  <input name="drawing_number" value="{{ circuit_i.drawing_number }}" placeholder="Drawing Number"> <br>
+  <input name="type" value="{{ circuit_i.type }}" placeholder="Type"> <br>
   <button type="submit">Submit</button><br>
   <hr>
   <h3>Circuit Elements</h3>
 </form>
 <form method="post" action="/circuit_form/circuit_element_submit">
-  <input name="device_description" placeholder="Device Description"> <br>
-  <input name="input_terminal" placeholder="Input Terminal"> <br>
-  <input name="comment" placeholder="Comment"> <br>
-  <input name="output_terminal" placeholder="Output Terminal"> <br>
-  <input name="output_wire" placeholder="Output Wire"> <br>
-  <select name="logic_gate" placeholder="Logic Gate">
-    <option value="OR">OR</option>
-    <option value="AND">AND</option>
-    <option value="END">END</option>
+  <input name="device_description" value="{{ edit_element.device_description }}" placeholder="Device Description"> <br>
+  <input name="input_terminal" value="{{ edit_element.input_terminal }}" placeholder="Input Terminal"> <br>
+  <input name="comment" value="{{ edit_element.comment }}" placeholder="Comment"> <br>
+  <input name="output_terminal" value="{{ edit_element.output_terminal }}" placeholder="Output Terminal"> <br>
+  <input name="output_wire" value="{{ edit_element.output_wire }}" placeholder="Output Wire"> <br>
+  <select name="logic_gate">
+    <option value="OR" {% if edit_element.logic_gate == "OR" %} selected {% endif %}>OR</option>
+    <option value="AND" {% if edit_element.logic_gate == "AND" %} selected {% endif %}>AND</option>
+    <option value="END" {% if edit_element.logic_gate == "END" %} selected {% endif %}>END</option>
   </select> <br>
-  <button type="submit">Submit</button><br>
+  <input type="hidden" name="index" value="{{ edit_index }}">
+  <button type="submit">
+    {% if edit_index != "" %}
+      Update
+    {% else %}
+      Add
+    {% endif %}
+  </button>
+{% if edit_index != "" %}<a href="/circuit_form">Cancel</a>{% endif %}
   <hr>
   <table>
-  {% for e in html_circuit.circuit_strings %}
-  <tr>      
+  {% for e in circuit_i.circuit_strings %}
+  <tr>
+    <td><a href="/circuit_form/delete/{{ loop.index0 }}">Delete</a></td>
+    <td><a href="/circuit_form/edit/{{ loop.index0 }}">Edit</a></td>
     <td> {{ e.device_description }} </td>
     <td> {{ e.input_terminal }} </td>
     <td> {{ e.comment }} </td>
@@ -36,3 +48,4 @@
 </table>
 </form>
 <a href="/circuit_form/view_circuit">View Circuit</a>
+{% endblock content %}
