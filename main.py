@@ -92,7 +92,7 @@ def circuit_headers_submit( circuit_name: str = Form(...), drawing_number: str =
 
 #Circuit Elements Submit
 @app.post("/circuit_form/circuit_element_submit")
-def circuit_element_submit(device_description: str = Form(...), input_terminal: str = Form(...), comment: str = Form(...), output_terminal: str = Form(...), output_wire: str = Form(...), logic_gate: str = Form(...), index: str = Form(...)):
+def circuit_element_submit(device_description: str = Form(...), input_terminal: str = Form(...), comment: str = Form(...), output_terminal: str = Form(...), output_wire: str = Form(...), logic_gate: str = Form(...), index: str = Form("")):
     new_element = {
         "device_description": device_description,
         "input_terminal": input_terminal,
@@ -104,5 +104,5 @@ def circuit_element_submit(device_description: str = Form(...), input_terminal: 
     if index == "":
         circuit["circuit_strings"].append(new_element)
     else:
-        circuit["circuit_strings"][index] = new_element
+        circuit["circuit_strings"][int(index)] = new_element
     return RedirectResponse("/circuit_form", status_code=303) #303 means make a get request to that URL. 

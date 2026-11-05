@@ -30,7 +30,9 @@
       Add
     {% endif %}
   </button>
-{% if edit_index != "" %}<a href="/circuit_form">Cancel</a>{% endif %}
+  {% if edit_index != "" %}
+    <a href="/circuit_form">Cancel</a>
+  {% endif %}
   <hr>
   <table>
   {% for e in circuit_i.circuit_strings %}
