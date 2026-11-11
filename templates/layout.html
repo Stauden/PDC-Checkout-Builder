@@ -1,20 +1,53 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>
-            {% if title %}
-            Checkout - {{ title }}
-            {% else %}
-            Checkout Builder
-            {% endif %}
-        </title>
-        <meta name="description" content="Checkout Sheet Builder">
-        <meta name="author" content="Jordan Stauffer">
-    </head>
-    <body>
-        {% block content %}
-        {% endblock content %}
-    </body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Checkout Sheet Builder">
+    <meta name="author" content="Jordan Stauffer">
+    <title>
+      {% if title %}
+        Checkout - {{ title }}
+    {% else %}
+        Checkout Builder
+    {% endif %}
+    </title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+
+    <style>
+      :root {
+        --pico-font-size: 87.5%;
+        --pico-line-height: 1.4;
+        --pico-spacing: 0.6rem;
+        --pico-form-element-spacing-vertical: 0.35rem;
+        --pico-form-element-spacing-horizontal: 0.6rem;
+      }
+
+      /* Form fields side by side */
+      .fields {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0 1rem;
+      }
+      @media (max-width: 700px) {
+        .fields { grid-template-columns: 1fr; }
+      }
+
+      /* Buttons only as wide as their text */
+      button[type="submit"] {
+        width: auto;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+
+      /* Elements table */
+      table.elements th, table.elements td { padding: 4px 10px; }
+      table.elements tr.editing { background: #fff6d5; }
+    </style>
+  </head>
+  <body>
+    {% block content %}
+    {% endblock content %}
+  </body>
 </html>

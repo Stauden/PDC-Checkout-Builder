@@ -3,12 +3,15 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from build import BASE_DIR, render_sheet, write_pdf_byte
 
+#for test button
+import copy
+from data import PDC_Circuit_Strings
 '''
 Start: uvicorn main:app --reload
 Start: uv run fastapi dev main.py
 '''
 
-app = FastAPI()
+app = FastAPI() #holds the routing table
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 circuit = {
@@ -40,6 +43,12 @@ def circuit_form(request: Request):
         "edit_element": empty_element,
         "edit_index": ""
         })
+
+#populate with test data
+@app.post("/circuit_form/populate")
+def populate_circuit():
+    circuit.update(copy.deepcopy(PDC_Circuit_Strings[0]))
+    return RedirectResponse("/circuit_form", status_code=303)
 
 #View Circuit Page
 @app.get("/circuit_form/view_circuit", response_class=HTMLResponse)
@@ -74,6 +83,7 @@ def delete_circuit_row(index: int):
 def edit_circuit_row(request: Request, index: int):
     if not(0 <= index < len(circuit["circuit_strings"])):
         return RedirectResponse("/circuit_form", status_code=303)
+    
     element = circuit["circuit_strings"][index]
     return templates.TemplateResponse(request, "circuit_form.html", {
         "circuit_i": circuit, 
