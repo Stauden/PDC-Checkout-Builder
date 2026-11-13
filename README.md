@@ -1,4 +1,4 @@
-# PDC Checkout Sheet Builder
+#PDC Checkout Sheet Builder
 
 A small FastAPI web app for building printed commissioning/checkout sheets for PDC switchgear permissive strings. You enter a circuit and its elements in the browser, and it produces a print-ready PDF that matches the layout of the legacy VBA Excel macro tool it replaces.
 
