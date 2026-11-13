@@ -14,9 +14,10 @@ Start: uv run fastapi dev main.py
 app = FastAPI() #holds the routing table
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
+circuits = []
+
 circuit = {
     #headers
-    "circuit_number": 1,
     "circuit_name": "",
     "drawing_number": "",
     "type": "",
@@ -28,6 +29,14 @@ empty_element = {
     "device_description": "", "input_terminal": "", "comment": "",
     "output_terminal": "", "output_wire": "", "logic_gate": "", 
 }
+
+def empty_circuit():
+    return {
+        "circuit_name": "",
+        "drawing_number": "",
+        "type": "",
+        "circuit_strings": []
+    }
 
 #Home Page
 @app.get("/", response_class=HTMLResponse)
@@ -41,14 +50,10 @@ def circuit_form(request: Request):
         "circuit_i": circuit,
         "title": "Circuit Form",
         "edit_element": empty_element,
-        "edit_index": ""
+        "edit_index": "",
+        "circuits": circuits
+        
         })
-
-#populate with test data
-@app.post("/circuit_form/populate")
-def populate_circuit():
-    circuit.update(copy.deepcopy(PDC_Circuit_Strings[0]))
-    return RedirectResponse("/circuit_form", status_code=303)
 
 #View Circuit Page
 @app.get("/circuit_form/view_circuit", response_class=HTMLResponse)
@@ -60,6 +65,17 @@ def view_circuit():
     """
     return links + view
 
+#View Circuits Page
+@app.get("/circuit_form/view_circuits", response_class=HTMLResponse)
+def view_circuits():
+    view = render_sheet(circuits)
+    links = """
+      <a href="/circuit_form">Back to Form</a> |
+      <a href="/circuit_form/download_circuits">Download PDF</a>
+    """
+    return links + view
+
+
 #Download Circuit Page
 @app.get("/circuit_form/download_circuit")
 def download_circuit():
@@ -69,6 +85,17 @@ def download_circuit():
         content=pdf_bytes,
         media_type="application/pdf",
         headers={"Content-Disposition": 'attachment; filename="web_output_circuit.pdf"'}
+    )
+
+#Download Circuits Page
+@app.get("/circuit_form/download_circuits")
+def download_circuits():
+    html = render_sheet(circuits)
+    pdf_bytes = write_pdf_byte(html)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="web_output_circuits.pdf"'}
     )
 
 #Deleteing rows
@@ -89,7 +116,8 @@ def edit_circuit_row(request: Request, index: int):
         "circuit_i": circuit, 
         "edit_index": index, 
         "edit_element": element, 
-        "title": "Circuit Form"
+        "title": "Circuit Form",
+        "circuits": circuits
         })
 
 #Circuit Headers Submit
@@ -98,6 +126,12 @@ def circuit_headers_submit( circuit_name: str = Form(...), drawing_number: str =
     circuit["circuit_name"] = circuit_name
     circuit["drawing_number"] = drawing_number
     circuit["type"] = type
+    return RedirectResponse("/circuit_form", status_code=303)
+
+#populate with test data
+@app.post("/circuit_form/populate")
+def populate_circuit():
+    circuit.update(copy.deepcopy(PDC_Circuit_Strings[0]))
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Circuit Elements Submit
@@ -116,3 +150,10 @@ def circuit_element_submit(device_description: str = Form(...), input_terminal: 
     else:
         circuit["circuit_strings"][int(index)] = new_element
     return RedirectResponse("/circuit_form", status_code=303) #303 means make a get request to that URL. 
+
+#Submit Circuit to List
+@app.post("/circuit_form/submit_circuit")
+def submit_circuit():
+    circuits.append(copy.deepcopy(circuit)) #Store Circuit
+    circuit.update(empty_circuit()) #Clear current circuit after saving
+    return RedirectResponse("/circuit_form", status_code=303)

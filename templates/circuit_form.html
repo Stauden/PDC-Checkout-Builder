@@ -35,26 +35,26 @@
   <form method="post" action="/circuit_form/circuit_element_submit">
     <div class="fields">
       <label>Device Description
-        <input name="device_description" value="{{ edit_element.device_description }}">
+        <input name="device_description" value="{{ edit_element['device_description'] }}">
       </label>
       <label>Input Terminal
-        <input name="input_terminal" value="{{ edit_element.input_terminal }}">
+        <input name="input_terminal" value="{{ edit_element['input_terminal'] }}">
       </label>
       <label>Comment
-        <input name="comment" value="{{ edit_element.comment }}">
+        <input name="comment" value="{{ edit_element['comment'] }}">
       </label>
       <label>Output Terminal
-        <input name="output_terminal" value="{{ edit_element.output_terminal }}">
+        <input name="output_terminal" value="{{ edit_element['output_terminal'] }}">
       </label>
       <label>Output Wire
-        <input name="output_wire" value="{{ edit_element.output_wire }}">
+        <input name="output_wire" value="{{ edit_element['output_wire'] }}">
       </label>
       <label>Logic
         <select name="logic_gate">
           <option value="">—</option>
-          <option value="AND" {% if edit_element.logic_gate == "AND" %}selected{% endif %}>AND</option>
-          <option value="OR" {% if edit_element.logic_gate == "OR" %}selected{% endif %}>OR</option>
-          <option value="LAST" {% if edit_element.logic_gate == "LAST" %}selected{% endif %}>LAST</option>
+          <option value="AND" {% if edit_element['logic_gate'] == "AND" %}selected{% endif %}>AND</option>
+          <option value="OR" {% if edit_element['logic_gate'] == "OR" %}selected{% endif %}>OR</option>
+          <option value="LAST" {% if edit_element['logic_gate'] == "LAST" %}selected{% endif %}>LAST</option>
         </select>
       </label>
     </div>
@@ -64,8 +64,11 @@
         Update
       {% else %}
         Add
-      {% endif %}</button>
-    {% if edit_index != "" %}<a href="/circuit_form" role="button" class="ghost">Cancel</a>{% endif %}
+      {% endif %}
+    </button>
+    {% if edit_index != "" %}
+      <a href="/circuit_form" role="button" class="ghost">Cancel</a>
+    {% endif %}
   </form>
 </article>
 
@@ -86,7 +89,7 @@
     </thead>
     <tbody>
       {% for element in circuit_i.circuit_strings %}
-      <tr {% if loop.index0 == edit_index %}class="editing"{% endif %}>
+      <tr {% if loop.index0 == edit_index %} class="editing"{% endif %}>
         <td>{{ loop.index }}</td>
         <td>{{ element.device_description }}</td>
         <td>{{ element.input_terminal }}</td>
@@ -104,6 +107,57 @@
       {% endfor %}
     </tbody>
   </table>
-  <a href="/circuit_form/view_circuit" role="button">View Sheet</a>
+
+  <div class="circuit-actions">
+    <a href="/circuit_form/view_circuit" role="button">View Circuit</a>
+
+    <form method="post" action="/circuit_form/submit_circuit">
+      <button type="submit">Submit Circuit</button>
+    </form>
+  </div>
+</article>
+
+<article>
+  <h3>Saved Circuits</h3>
+  {% if circuits %}
+    <table>
+      <thead>
+        <tr>
+          <th>Circuit</th>
+          <th>Name</th>
+          <th>Drawing Number</th>
+          <th>Type</th>
+          <th>Elements</th>
+        </tr>
+      </thead>
+      {% for s in circuits %}
+        <tbody>
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ s.circuit_name }}</td>
+            <td>{{ s.drawing_number }}</td>
+            <td>{{ s.type }}</td>
+            <td>{{ s.circuit_strings | length }}</td>
+            <td> 
+              <form method="post" action="/circuit_form/delete_circuit/{{ loop.index0 }}">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="/circuit_form/edit_circuit/{{ loop.index0 }}">
+                <button type="submit">Edit</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      {% endfor %}
+    </table>
+    <div class="actions">
+      <a href="/circuit_form/view_circuits" role="button">View Circuits</a>
+    </div>
+  {% else %}
+    <p>No saved circuits yet.</p>
+  {% endif %}
+  
 </article>
 {% endblock content %}
