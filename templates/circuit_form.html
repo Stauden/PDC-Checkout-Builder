@@ -88,18 +88,20 @@
       </tr>
     </thead>
     <tbody>
-      {% for element in circuit_i.circuit_strings %}
+      {% for e in circuit_i.circuit_strings %}
       <tr {% if loop.index0 == edit_index %} class="editing"{% endif %}>
         <td>{{ loop.index }}</td>
-        <td>{{ element.device_description }}</td>
-        <td>{{ element.input_terminal }}</td>
-        <td>{{ element.comment }}</td>
-        <td>{{ element.output_terminal }}</td>
-        <td>{{ element.output_wire }}</td>
-        <td>{{ element.logic_gate }}</td>
+        <td>{{ e.device_description }}</td>
+        <td>{{ e.input_terminal }}</td>
+        <td>{{ e.comment }}</td>
+        <td>{{ e.output_terminal }}</td>
+        <td>{{ e.output_wire }}</td>
+        <td>{{ e.logic_gate }}</td>
         <td>
-          <a href="/circuit_form/edit/{{ loop.index0 }}" role="button" class="ghost">Edit</a>
-          <a href="/circuit_form/delete/{{ loop.index0 }}" role="button" class="ghost">Delete</a>
+          <div class="actions compact">
+            <a href="/circuit_form/edit/{{ loop.index0 }}" role="button" class="ghost">Edit</a>
+            <a href="/circuit_form/delete/{{ loop.index0 }}" role="button" class="ghost">Delete</a>
+          </div>
         </td>
       </tr>
       {% else %}
@@ -108,7 +110,7 @@
     </tbody>
   </table>
 
-  <div class="circuit-actions">
+  <div class="actions">
     <a href="/circuit_form/view_circuit" role="button">View Circuit</a>
 
     <form method="post" action="/circuit_form/submit_circuit">
@@ -118,7 +120,13 @@
 </article>
 
 <article>
-  <h3>Saved Circuits</h3>
+  <h3>
+    {% if circuit_i != "" %}
+      Saved Circuits
+    {% else %}
+      Edit Circuit - {{ circuit_i.circuit_name }}
+    {% endif %}
+  </h3>
   {% if circuits %}
     <table>
       <thead>
@@ -128,29 +136,26 @@
           <th>Drawing Number</th>
           <th>Type</th>
           <th>Elements</th>
+          <th></th>
         </tr>
       </thead>
+      <tbody>
       {% for s in circuits %}
-        <tbody>
           <tr>
             <td>{{ loop.index }}</td>
             <td>{{ s.circuit_name }}</td>
             <td>{{ s.drawing_number }}</td>
             <td>{{ s.type }}</td>
             <td>{{ s.circuit_strings | length }}</td>
-            <td> 
-              <form method="post" action="/circuit_form/delete_circuit/{{ loop.index0 }}">
-                <button type="submit">Delete</button>
-              </form>
-            </td>
             <td>
-              <form method="post" action="/circuit_form/edit_circuit/{{ loop.index0 }}">
-                <button type="submit">Edit</button>
-              </form>
+              <div class="actions compact">
+                <a href="/circuit_form/edit_circuit/{{ loop.index0 }}" role="button" class="ghost">Edit</a>
+                <a href="/circuit_form/delete_circuit/{{ loop.index0 }}" role="button" class="ghost">Delete</a>
+              </div>
             </td>
           </tr>
-        </tbody>
       {% endfor %}
+      </tbody>
     </table>
     <div class="actions">
       <a href="/circuit_form/view_circuits" role="button">View Circuits</a>

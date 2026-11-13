@@ -75,7 +75,6 @@ def view_circuits():
     """
     return links + view
 
-
 #Download Circuit Page
 @app.get("/circuit_form/download_circuit")
 def download_circuit():
@@ -98,11 +97,18 @@ def download_circuits():
         headers={"Content-Disposition": 'attachment; filename="web_output_circuits.pdf"'}
     )
 
-#Deleteing rows
+#Deleting elements
 @app.get("/circuit_form/delete/{index}")
 def delete_circuit_row(index: int):
     if 0 <= index < len(circuit["circuit_strings"]):
         del circuit["circuit_strings"][index]
+    return RedirectResponse("/circuit_form", status_code=303)
+
+#Deleting circuits
+@app.get("/circuit_form/delete_circuit/{index}")
+def delete_circuits(index: int):
+    if 0 <= index < len(circuits):
+        del circuits[index]
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Editing rows
@@ -119,6 +125,17 @@ def edit_circuit_row(request: Request, index: int):
         "title": "Circuit Form",
         "circuits": circuits
         })
+
+#Editing circuits
+@app.get("/circuit_form/edit_circuit/{index}", response_class=HTMLResponse)
+def edit_circuits(request: Request, index: int):
+    if not(0 <= index < len(circuits)):
+        return RedirectResponse("/circuit_form", status_code=303)
+
+    #populates circuit with selected circuit data
+    circuit.update(copy.deepcopy(circuits[index]))
+    
+    return RedirectResponse("/circuit_form", status_code=303)
 
 #Circuit Headers Submit
 @app.post("/circuit_form/circuit_headers_submit")

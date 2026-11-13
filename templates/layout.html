@@ -8,14 +8,15 @@
     <title>
       {% if title %}
         Checkout - {{ title }}
-    {% else %}
+      {% else %}
         Checkout Builder
-    {% endif %}
+      {% endif %}
     </title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
 
     <style>
+      /* 1. Make Pico smaller (must come after the Pico link) */
       :root {
         --pico-font-size: 87.5%;
         --pico-line-height: 1.4;
@@ -24,7 +25,7 @@
         --pico-form-element-spacing-horizontal: 0.6rem;
       }
 
-      /* Form fields side by side */
+      /* 2. Form inputs in three columns (one column on narrow screens) */
       .fields {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -34,28 +35,46 @@
         .fields { grid-template-columns: 1fr; }
       }
 
-      /* Circuit actions container */
-      .circuit-actions {
+      /* 3. A row of buttons side by side ("compact" = smaller, for inside tables) */
+      .actions {
         display: flex;
         gap: 0.75rem;
         align-items: center;
         margin-top: 1rem;
       }
-      .circuit-actions form,
-      .circuit-actions button {
+      .actions form,
+      .actions button,
+      .actions a {
         margin: 0;
       }
+      .actions.compact {
+        gap: 0.4rem;
+        margin-top: 0;
+      }
+      .actions.compact a[role="button"],
+      .actions.compact button[type="submit"] {
+        font-size: 0.85em;
+        padding: 0.15rem 0.6rem;
+      }
 
-      /* Buttons only as wide as their text */
+      /* 4. Buttons only as wide as their text */
       button[type="submit"] {
         width: auto;
         padding-left: 1.25rem;
         padding-right: 1.25rem;
       }
 
-      /* Elements table */
-      table.elements th, table.elements td { padding: 4px 10px; }
-      table.elements tr.editing { background: #fff6d5; }
+      /* 5. Tables: center rows, tighter cells, highlight the row being edited */
+      td {
+        vertical-align: middle;
+      }
+      table.elements th,
+      table.elements td {
+        padding: 4px 10px;
+      }
+      table.elements tr.editing td {
+        background: rgba(255, 200, 0, 0.15);
+      }
     </style>
   </head>
   <body>
