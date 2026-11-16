@@ -14,7 +14,9 @@ Start: uv run fastapi dev main.py
 app = FastAPI() #holds the routing table
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
-circuits = []
+circuits = {}
+circuits_id_d = {"circuit_id": None}
+circuits_counter = {"value": 1}
 
 circuit = {
     #headers
@@ -38,8 +40,6 @@ def empty_circuit():
         "circuit_strings": []
     }
 
-editing_circuit = {"circuit_index": None}
-
 #Home Page
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -53,8 +53,8 @@ def circuit_form(request: Request):
         "title": "Circuit Form",
         "edit_element": empty_element,
         "edit_index": "",
-        "circuits": circuits
-        
+        "circuits": circuits,
+        "editing_circuit_id": circuits_id_d["circuit_id"],
         })
 
 #View Circuit Page
@@ -70,7 +70,7 @@ def view_circuit():
 #View Circuits Page
 @app.get("/circuit_form/view_circuits", response_class=HTMLResponse)
 def view_circuits():
-    view = render_sheet(circuits)
+    view = render_sheet(list(circuits.values()))
     links = """
       <a href="/circuit_form">Back to Form</a> |
       <a href="/circuit_form/download_circuits">Download PDF</a>
@@ -91,7 +91,7 @@ def download_circuit():
 #Download Circuits Page
 @app.get("/circuit_form/download_circuits")
 def download_circuits():
-    html = render_sheet(circuits)
+    html = render_sheet(list(circuits.values()))
     pdf_bytes = write_pdf_byte(html)
     return Response(
         content=pdf_bytes,
@@ -107,10 +107,12 @@ def delete_circuit_row(index: int):
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Deleting circuits
-@app.get("/circuit_form/delete_circuit/{index}")
-def delete_circuits(index: int):
-    if 0 <= index < len(circuits):
-        del circuits[index]
+@app.get("/circuit_form/delete_circuit/{circuit_id}")
+def delete_circuits(circuit_id: int):
+    if circuit_id in circuits:
+        del circuits[circuit_id]
+        if circuit_id == circuits_id_d["circuit_id"]:
+            circuits_id_d["circuit_id"] = None
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Editing rows
@@ -125,18 +127,19 @@ def edit_circuit_row(request: Request, index: int):
         "edit_index": index, 
         "edit_element": element, 
         "title": "Circuit Form",
-        "circuits": circuits
+        "circuits": circuits,
+        "editing_circuit_id": circuits_id_d["circuit_id"],
         })
 
 #Editing circuits
-@app.get("/circuit_form/edit_circuit/{index}", response_class=HTMLResponse)
-def edit_circuits(request: Request, index: int):
-    if not(0 <= index < len(circuits)):
+@app.get("/circuit_form/edit_circuit/{circuit_id}")
+def edit_circuits(circuit_id: int):
+    if circuit_id not in circuits:
         return RedirectResponse("/circuit_form", status_code=303)
-
+    
+    circuits_id_d["circuit_id"] = circuit_id
     #populates circuit with selected circuit data
-    circuit.update(copy.deepcopy(circuits[index]))
-    editing_circuit["circuit_index"] = index #store index of circuit being edited
+    circuit.update(copy.deepcopy(circuits[circuit_id]))
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Circuit Headers Submit
@@ -173,11 +176,13 @@ def circuit_element_submit(device_description: str = Form(...), input_terminal: 
 #Submit Circuit to List
 @app.post("/circuit_form/submit_circuit")
 def submit_circuit():
-    if editing_circuit["circuit_index"] is None:
-        circuits.append(copy.deepcopy(circuit)) #Store Circuit
+    if circuits_id_d["circuit_id"] is None:
+        new_id = circuits_counter["value"]
+        circuits[new_id] = copy.deepcopy(circuit) #Store Circuit
+        circuits_counter["value"] += 1
     else:
-        circuits[editing_circuit["circuit_index"]] = copy.deepcopy(circuit) #Update Circuit
-    editing_circuit["circuit_index"] = None #Reset editing index
+        circuits[circuits_id_d["circuit_id"]] = copy.deepcopy(circuit) #Update Circuit
+    circuits_id_d["circuit_id"] = None #Reset editing index
     circuit.update(empty_circuit()) #Clear current circuit after saving
     return RedirectResponse("/circuit_form", status_code=303)
 

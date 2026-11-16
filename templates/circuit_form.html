@@ -89,7 +89,9 @@
     </thead>
     <tbody>
       {% for e in circuit_i.circuit_strings %}
-      <tr {% if loop.index0 == edit_index %} class="editing"{% endif %}>
+      <tr {% if loop.index0 == edit_index %}
+            class="editing"
+          {% endif %}>
         <td>{{ loop.index }}</td>
         <td>{{ e.device_description }}</td>
         <td>{{ e.input_terminal }}</td>
@@ -114,21 +116,21 @@
     <a href="/circuit_form/view_circuit" role="button">View Circuit</a>
 
     <form method="post" action="/circuit_form/submit_circuit">
-      <button type="submit">Submit Circuit</button>
+      <button type="submit">
+        {% if editing_circuit_id is none %}
+          Submit Circuit
+        {% else %}
+          Save Changes
+        {% endif %}
+      </button>
     </form>
   </div>
 </article>
 
 <article>
-  <h3>
-    {% if circuit_i != "" %}
-      Saved Circuits
-    {% else %}
-      Edit Circuit - {{ circuit_i.circuit_name }}
-    {% endif %}
-  </h3>
+  <h3>Saved Circuits</h3>
   {% if circuits %}
-    <table>
+    <table class="elements">
       <thead>
         <tr>
           <th>Circuit</th>
@@ -140,29 +142,28 @@
         </tr>
       </thead>
       <tbody>
-      {% for s in circuits %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ s.circuit_name }}</td>
-            <td>{{ s.drawing_number }}</td>
-            <td>{{ s.type }}</td>
-            <td>{{ s.circuit_strings | length }}</td>
-            <td>
-              <div class="actions compact">
-                <a href="/circuit_form/edit_circuit/{{ loop.index0 }}" role="button" class="ghost">Edit</a>
-                <a href="/circuit_form/delete_circuit/{{ loop.index0 }}" role="button" class="ghost">Delete</a>
-              </div>
-            </td>
-          </tr>
+      {% for circuit_id, s in circuits.items() %}
+        <tr {% if circuit_id == editing_circuit_id %}class="editing"{% endif %}>
+          <td>{{ loop.index }}</td>
+          <td>{{ s.circuit_name }}</td>
+          <td>{{ s.drawing_number }}</td>
+          <td>{{ s.type }}</td>
+          <td>{{ s.circuit_strings | length }}</td>
+          <td>
+            <div class="actions compact">
+              <a href="/circuit_form/edit_circuit/{{ circuit_id }}" role="button" class="ghost">Edit</a>
+              <a href="/circuit_form/delete_circuit/{{ circuit_id }}" role="button" class="ghost">Delete</a>
+            </div>
+          </td>
+        </tr>
       {% endfor %}
       </tbody>
     </table>
     <div class="actions">
       <a href="/circuit_form/view_circuits" role="button">View Circuits</a>
     </div>
-  {% else %}
-    <p>No saved circuits yet.</p>
-  {% endif %}
-  
-</article>
+      {% else %}
+        <p>No saved circuits yet.</p>
+      {% endif %}
+  </article>
 {% endblock content %}
