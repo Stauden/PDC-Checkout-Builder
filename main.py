@@ -38,6 +38,8 @@ def empty_circuit():
         "circuit_strings": []
     }
 
+editing_circuit = {"circuit_index": None}
+
 #Home Page
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -134,7 +136,7 @@ def edit_circuits(request: Request, index: int):
 
     #populates circuit with selected circuit data
     circuit.update(copy.deepcopy(circuits[index]))
-    
+    editing_circuit["circuit_index"] = index #store index of circuit being edited
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Circuit Headers Submit
@@ -145,10 +147,10 @@ def circuit_headers_submit( circuit_name: str = Form(...), drawing_number: str =
     circuit["type"] = type
     return RedirectResponse("/circuit_form", status_code=303)
 
-#populate with test data
+#Populate with test data
 @app.post("/circuit_form/populate")
 def populate_circuit():
-    circuit.update(copy.deepcopy(PDC_Circuit_Strings[0]))
+    circuit.update(copy.deepcopy(PDC_Circuit_Strings[2]))
     return RedirectResponse("/circuit_form", status_code=303)
 
 #Circuit Elements Submit
@@ -171,6 +173,13 @@ def circuit_element_submit(device_description: str = Form(...), input_terminal: 
 #Submit Circuit to List
 @app.post("/circuit_form/submit_circuit")
 def submit_circuit():
-    circuits.append(copy.deepcopy(circuit)) #Store Circuit
+    if editing_circuit["circuit_index"] is None:
+        circuits.append(copy.deepcopy(circuit)) #Store Circuit
+    else:
+        circuits[editing_circuit["circuit_index"]] = copy.deepcopy(circuit) #Update Circuit
+    editing_circuit["circuit_index"] = None #Reset editing index
     circuit.update(empty_circuit()) #Clear current circuit after saving
     return RedirectResponse("/circuit_form", status_code=303)
+
+       
+
