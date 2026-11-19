@@ -6,6 +6,7 @@ from build import BASE_DIR, render_sheet, write_pdf_byte
 #for test button
 import copy
 from data import PDC_Circuit_Strings
+
 '''
 Start: uvicorn main:app --reload
 Start: uv run fastapi dev main.py
@@ -15,7 +16,9 @@ app = FastAPI() #holds the routing table
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 circuits = {}
+
 circuits_id_d = {"circuit_id": None}
+
 circuits_counter = {"value": 1}
 
 circuit = {

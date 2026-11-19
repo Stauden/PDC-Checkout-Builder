@@ -1,0 +1,123 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Checkout Sheet</title>
+<style>
+  @page {
+    size: letter;
+    margin: 0.5in 0.5in 0.6in 0.5in;
+    @bottom-left  { content: "Switchgear permissive checkout"; font-size: 8pt; font-family: Calibri, Arial, sans-serif; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font-size: 8pt; font-family: Calibri, Arial, sans-serif; }
+  }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 10pt; color: #000; }
+
+  .circuit + .circuit { break-before: page; }
+
+  /* Circuit header */
+  .head { border: 2px solid #000; margin-bottom: 8px; }
+  .head-top { display: flex; justify-content: space-between; align-items: baseline;
+              border-bottom: 1px solid #000; padding: 4px 8px; }
+  .head-top h1 { font-size: 14pt; margin: 0; }
+  .head-top .name { font-size: 12pt; font-weight: bold; }
+  .head-grid { display: flex; }
+  .head-grid div { flex: 1; padding: 3px 8px; border-right: 1px solid #000; }
+  .head-grid div:last-child { border-right: none; }
+  .lbl { display: block; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em; }
+  .val { font-weight: bold; }
+
+  /* Element table */
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #000; padding: 2px 5px; vertical-align: top; }
+  thead th { font-size: 8pt; text-transform: uppercase; letter-spacing: 0.03em;
+             text-align: left; border-bottom: 2px solid #000; }
+  thead .cont td { border: none; padding: 0 0 3px 0; font-size: 8pt; font-style: italic; }
+  tr { break-inside: avoid; }
+  .num  { width: 4%; text-align: right; font-weight: bold; }
+  .dev  { width: 34%; }
+  .dev .comment { display: block; font-size: 8.5pt; font-style: italic; margin-top: 1px; }
+  .term { width: 11%; text-align: center; font-family: Consolas, "Courier New", monospace; font-weight: bold; }
+  .logic { width: 7%; text-align: center; font-weight: bold; }
+  .check { width: 11%; }
+  .na { font-weight: normal; }
+
+  /* Logic between rows: OR = alternate path, drawn with a dashed divider */
+  tr.or-next td { border-bottom: 2px dashed #000; }
+  tr.last td { border-bottom: 2px solid #000; }
+  tr.last .logic { font-size: 8pt; }
+
+  /* Sign-off and notes */
+  .signoff { display: flex; gap: 16px; margin-top: 10px; break-inside: avoid; }
+  .signoff div { flex: 1; border-bottom: 1px solid #000; padding-top: 14px; font-size: 8pt; }
+  .notes { margin-top: 10px; border: 1px solid #000; padding: 3px 6px; break-inside: avoid; }
+  .notes .line { border-bottom: 1px solid #000; height: 20px; }
+  .notes .line:last-child { border-bottom: none; }
+  .legend { margin-top: 6px; font-size: 7.5pt; }
+</style></head>
+<body>
+
+{% set counter = namespace(n=0) %}
+{% for circuit in circuits %}
+<section class="circuit">
+
+  <div class="head">
+    <div class="head-top">
+      <h1>Switch gear circuit #{{ loop.index }}</h1>
+      <span class="name">{{ circuit.circuit_name }}</span>
+    </div>
+    <div class="head-grid">
+      <div><span class="lbl">Drawing</span><span class="val">{{ circuit.drawing_number }}</span></div>
+      <div><span class="lbl">Type</span><span class="val">{{ circuit.type }}</span></div>
+      <div><span class="lbl">Elements</span><span class="val">{{ circuit.circuit_strings | length }}</span></div>
+      <div><span class="lbl">Circuit initials</span>&nbsp;</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr class="cont"><td colspan="7">Circuit #{{ loop.index }} &middot; {{ circuit.circuit_name }} &middot; {{ circuit.drawing_number }}</td></tr>
+      <tr>
+        <th class="num">#</th>
+        <th class="dev">Device / comment</th>
+        <th class="term">In</th>
+        <th class="term">Out</th>
+        <th class="term">Wire</th>
+        <th class="logic">Logic</th>
+        <th class="check">Initials</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for element in circuit.circuit_strings %}
+      {% set counter.n = counter.n + 1 %}
+      <tr class="{% if loop.last %}last{% elif element.logic_gate == 'OR' %}or-next{% endif %}">
+        <td class="num">{{ counter.n }}</td>
+        <td class="dev">
+          {{ element.device_description }}
+          {% if element.comment %}<span class="comment">{{ element.comment }}</span>{% endif %}
+        </td>
+        <td class="term {% if element.input_terminal == 'N/A' %}na{% endif %}">{{ element.input_terminal }}</td>
+        <td class="term {% if element.output_terminal == 'N/A' %}na{% endif %}">{{ element.output_terminal }}</td>
+        <td class="term {% if element.output_wire == 'N/A' %}na{% endif %}">{{ element.output_wire }}</td>
+        <td class="logic">{% if loop.last %}END{% else %}{{ element.logic_gate }}{% endif %}</td>
+        <td class="check"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="legend">Solid line = AND (series). Dashed line = OR (alternate path). Heavy line = end of string.</div>
+
+  <div class="signoff">
+    <div>Tested by</div>
+    <div>Date</div>
+    <div>Witness</div>
+    <div>Result (pass / fail)</div>
+  </div>
+
+  <div class="notes">
+    <span class="lbl">Notes</span>
+    <div class="line"></div>
+    <div class="line"></div>
+  </div>
+
+</section>
+{% endfor %}
+
+</body></html>

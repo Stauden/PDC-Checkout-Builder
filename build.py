@@ -16,7 +16,7 @@ env = Environment(
 
 #
 def render_sheet(input_circuits):
-    return env.get_template("string_sheet.html").render(circuits=input_circuits)
+    return env.get_template("string_sheet_v2.html").render(circuits=input_circuits)
 
 def write_pdf(html, path):
     HTML(string=html).write_pdf(path)
